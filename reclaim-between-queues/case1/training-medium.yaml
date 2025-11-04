@@ -1,14 +1,14 @@
 apiVersion: batch.volcano.sh/v1alpha1
 kind: Job
 metadata:
-  name: tide-training-high
+  name: training-medium
   annotations:
     volcano.sh/preemptable: "true"
 spec:
   minAvailable: 1
-  priorityClassName: tide-pc-high
+  priorityClassName: pc-medium
   schedulerName: volcano
-  queue: tide-queue-training
+  queue: queue-training
   policies:
   - action: CompleteJob
     event: TaskCompleted
