@@ -1,0 +1,46 @@
+apiVersion: batch.volcano.sh/v1alpha1
+kind: Job
+metadata:
+  name: training-low1
+  annotations:
+    volcano.sh/preemptable: "true"
+spec:
+  minAvailable: 1
+  priorityClassName: pc-low
+  schedulerName: volcano
+  queue: queue-training
+  policies:
+  - action: CompleteJob
+    event: TaskCompleted
+  tasks:
+  - replicas: 1
+    name: worker
+    template:
+      metadata:
+        annotations:
+          volcano.sh/card.name: NVIDIA-GeForce-RTX-4090
+      spec:
+        affinity:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+              - matchExpressions:
+                - key: nvidia.com/gpu.product
+                  operator: In
+                  values:
+                  - NVIDIA-GeForce-RTX-4090
+        restartPolicy: Never
+        containers:
+        - image: alpine:latest
+          imagePullPolicy: IfNotPresent
+          name: worker
+          command: ["sh", "-c", "sleep 1d"]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 100Mi
+              nvidia.com/gpu: 2
+            limits:
+              cpu: 100m
+              memory: 100Mi
+              nvidia.com/gpu: 2
