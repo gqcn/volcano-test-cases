@@ -1,0 +1,16 @@
+apiVersion: scheduling.volcano.sh/v1beta1
+kind: Queue
+metadata:
+  name: tide-queue-inference
+  annotations:
+    volcano.sh/card.quota: '{"NVIDIA-GeForce-RTX-4090":8}'
+spec:
+  weight: 1
+  # 在线服务的队列设置的优先级需要比离线任务高，
+  # 以便在线服务在进行资源抢占的时候优先抢占离线任务的队列资源。
+  # 所有在线队列使用同一个优先级值即可。
+  priority: 80000 
+  reclaimable: false
+  capability:
+    cpu: 4
+    memory: 4Gi

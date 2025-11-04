@@ -1,0 +1,8 @@
+apiVersion: scheduling.k8s.io/v1
+description: Low priority class for Volcano.
+kind: PriorityClass
+metadata:
+  name: tide-pc-medium
+globalDefault: false
+preemptionPolicy: PreemptLowerPriority
+value: 60000
