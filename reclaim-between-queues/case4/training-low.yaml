@@ -1,0 +1,81 @@
+apiVersion: batch.volcano.sh/v1alpha1
+kind: Job
+metadata:
+  name: training-low
+  annotations:
+    volcano.sh/preemptable: "true"
+spec:
+  minAvailable: 1
+  priorityClassName: pc-low
+  schedulerName: volcano
+  queue: queue-training
+  policies:
+  - event: TaskCompleted
+    action: CompleteJob
+  - event: PodFailed
+    action: AbortJob 
+  - event: PodEvicted
+    action: AbortJob 
+  tasks:
+  - replicas: 1
+    name: worker1
+    template:
+      metadata:
+        annotations:
+          volcano.sh/card.name: NVIDIA-GeForce-RTX-4090
+      spec:
+        affinity:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+              - matchExpressions:
+                - key: nvidia.com/gpu.product
+                  operator: In
+                  values:
+                  - NVIDIA-GeForce-RTX-4090
+        restartPolicy: Never
+        containers:
+        - image: alpine:latest
+          imagePullPolicy: IfNotPresent
+          name: worker
+          command: ["sh", "-c", "sleep 1d"]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 100Mi
+              nvidia.com/gpu: 4
+            limits:
+              cpu: 100m
+              memory: 100Mi
+              nvidia.com/gpu: 4
+  - replicas: 1
+    name: worker2
+    template:
+      metadata:
+        annotations:
+          volcano.sh/card.name: NVIDIA-GeForce-RTX-4090
+      spec:
+        affinity:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+              - matchExpressions:
+                - key: nvidia.com/gpu.product
+                  operator: In
+                  values:
+                  - NVIDIA-GeForce-RTX-4090
+        restartPolicy: Never
+        containers:
+        - image: alpine:latest
+          imagePullPolicy: IfNotPresent
+          name: worker
+          command: ["sh", "-c", "sleep 1d"]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 100Mi
+              nvidia.com/gpu: 4
+            limits:
+              cpu: 100m
+              memory: 100Mi
+              nvidia.com/gpu: 4
