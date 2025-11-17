@@ -5,17 +5,17 @@ metadata:
   annotations:
     volcano.sh/preemptable: "true"
 spec:
-  minAvailable: 1
+  # gang策略关键配置，设置识别可用的最小副本数
+  minAvailable: 2
   priorityClassName: pc-low
   schedulerName: volcano
   queue: queue-training
   policies:
   - event: TaskCompleted
     action: CompleteJob
-  - event: PodFailed
-    action: AbortJob 
+  # 只要任一Task被资源抢占，那么整个任务重启（引发Pod Pending状态）
   - event: PodEvicted
-    action: AbortJob 
+    action: RestartJob 
   tasks:
   - replicas: 1
     name: worker1
