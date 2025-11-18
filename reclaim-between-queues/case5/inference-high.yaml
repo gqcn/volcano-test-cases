@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inference-high
+  annotations:
+    volcano.sh/preemptable: "false"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+      annotations:
+        volcano.sh/card.name: NVIDIA-GeForce-RTX-4090
+        scheduling.volcano.sh/queue-name: "queue-inference"
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: nvidia.com/gpu.product
+                operator: In
+                values:
+                - NVIDIA-GeForce-RTX-4090
+      schedulerName: volcano
+      containers:
+      - name: nginx
+        image: nginx
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+            nvidia.com/gpu: 4
+          limits:
+            cpu: 100m
+            memory: 100Mi
+            nvidia.com/gpu: 4

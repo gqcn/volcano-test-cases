@@ -1,0 +1,8 @@
+apiVersion: scheduling.k8s.io/v1
+description: High priority class for Volcano.
+kind: PriorityClass
+metadata:
+  name: pc-high
+globalDefault: false
+preemptionPolicy: PreemptLowerPriority
+value: 80000
